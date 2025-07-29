@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jurnal 7 Kebiasaan Anak Indonesia Hebat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f9ff;
+        }
+        .habit-card {
+            transition: all 0.3s ease;
+        }
+        .habit-card:hover {
+            transform: translateY(-5px);
+        }
+        .leaderboard-item {
+            transition: all 0.3s ease;
+        }
+        .leaderboard-item:hover {
+            transform: scale(1.02);
+        }
+        .medal-1 {
+            background: linear-gradient(45deg, #FFD700, #FFC800);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+        }
+        .medal-2 {
+            background: linear-gradient(45deg, #C0C0C0, #E0E0E0);
+            box-shadow: 0 4px 15px rgba(192, 192, 192, 0.5);
+        }
+        .medal-3 {
+            background: linear-gradient(45deg, #CD7F32, #E9967A);
+            box-shadow: 0 4px 15px rgba(205, 127, 50, 0.5);
+        }
+        .medal-4, .medal-5 {
+            background: linear-gradient(45deg, #87CEEB, #00BFFF);
+            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.3);
+        }
+        .progress-bar {
+            transition: width 1s ease-in-out;
+        }
+        .notification {
+            animation: fadeOut 3s forwards;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div id="welcome-screen" class="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100">
+        <div class="w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white text-center">
+                <h1 class="text-3xl font-bold mb-2">Jurnal 7 Kebiasaan Anak Indonesia Hebat</h1>
+                <p class="text-lg opacity-90">Membangun Generasi Unggul dan Berkarakter</p>
+            </div>
+            
+            <div class="p-8">
+                <div class="mb-6">
+                    <label for="school-name" class="block text-gray-700 font-medium mb-2">Nama Sekolah</label>
+                    <input type="text" id="school-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan nama sekolah">
+                </div>
+                
+                <div class="mb-6">
+                    <label for="teacher-name" class="block text-gray-700 font-medium mb-2">Nama Guru</label>
+                    <input type="text" id="teacher-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan nama guru">
+                </div>
+                
+                <div class="mb-6">
+                    <label for="class-name" class="block text-gray-700 font-medium mb-2">Kelas</label>
+                    <input type="text" id="class-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: 5A / 7B / 10C">
+                </div>
+                
+                <div class="flex justify-center mt-8">
+                    <button id="start-btn" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg shadow-lg hover:from-blue-700 hover:to-purple-700 transition duration-300 transform hover:scale-105">Mulai Jurnal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 pb-12">
+        <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 shadow-md">
+            <div class="container mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div>
+                        <h1 id="header-school-name" class="text-2xl font-bold">Nama Sekolah</h1>
+                        <p id="header-class-info" class="text-sm opacity-90">Kelas: -</p>
+                    </div>
+                    <div class="flex items-center mt-3 md:mt-0">
+                        <p id="header-teacher-name" class="mr-4">Guru: -</p>
+                        <div class="flex space-x-2">
+                            <button id="settings-btn" class="px-4 py-2 bg-white text-orange-600 rounded-lg hover:bg-blue-50 transition">Pengaturan</button>
+                            <button id="add-student-btn" class="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition">Tambah Siswa</button>
+                            <button id="view-leaderboard-btn" class="px-4 py-2 bg-white text-purple-600 rounded-lg hover:bg-blue-50 transition">Peringkat</button>
+                            <button id="class-analysis-btn" class="px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-blue-50 transition">Analisis Kelas</button>
+                            <button id="export-excel-btn" class="px-4 py-2 bg-white text-indigo-600 rounded-lg hover:bg-blue-50 transition">Ekspor Excel</button>
+                            <button id="back-to-welcome" class="px-4 py-2 bg-white text-gray-600 rounded-lg hover:bg-blue-50 transition">Keluar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container mx-auto p-4 mt-6">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Pencatatan Kebiasaan</h2>
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-4 md:mt-0">
+                        <div class="flex items-center">
+                            <label for="record-date" class="mr-2 text-gray-700">Tanggal:</label>
+                            <input type="date" id="record-date" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="flex items-center">
+                            <label for="record-month" class="mr-2 text-gray-700">Bulan:</label>
+                            <select id="record-month" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="1">Januari</option>
+                                <option value="2">Februari</option>
+                                <option value="3">Maret</option>
+                                <option value="4">April</option>
+                                <option value="5">Mei</option>
+                                <option value="6">Juni</option>
+                                <option value="7">Juli</option>
+                                <option value="8">Agustus</option>
+                                <option value="9">September</option>
+                                <option value="10">Oktober</option>
+                                <option value="11">November</option>
+                                <option value="12">Desember</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center">
+                            <label for="record-year" class="mr-2 text-gray-700">Tahun:</label>
+                            <select id="record-year" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">No</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Nama Siswa</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Bangun Pagi</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Beribadah</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Berolahraga</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Makan Sehat</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Gemar Belajar</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Bermasyarakat</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Tidur Cepat</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Poin</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body">
+                            <tr>
+                                <td colspan="11" class="px-4 py-8 text-center text-gray-500">
+                                    Belum ada data siswa. Silakan tambahkan siswa terlebih dahulu.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Pengaturan</h2>
+                <button id="close-settings" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <label for="settings-school-name" class="block text-gray-700 font-medium mb-2">Nama Sekolah</label>
+                <input type="text" id="settings-school-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan nama sekolah">
+            </div>
+            
+            <div class="mb-6">
+                <label for="settings-teacher-name" class="block text-gray-700 font-medium mb-2">Nama Guru</label>
+                <input type="text" id="settings-teacher-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan nama guru">
+            </div>
+            
+            <div class="mb-6">
+                <label for="settings-class-name" class="block text-gray-700 font-medium mb-2">Kelas</label>
+                <input type="text" id="settings-class-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: 5A / 7B / 10C">
+            </div>
+            
+            <div class="flex justify-end space-x-3 mt-6">
+                <button id="cancel-settings" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">Batal</button>
+                <button id="save-settings" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div id="add-student-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Tambah Siswa Baru</h2>
+            <div class="mb-4">
+                <label for="new-student-name" class="block text-gray-700 font-medium mb-2">Nama Siswa</label>
+                <input type="text" id="new-student-name" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan nama siswa">
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button id="cancel-add-student" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">Batal</button>
+                <button id="confirm-add-student" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Tambah</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Report Modal -->
+    <div id="student-report-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="report-student-name" class="text-2xl font-bold text-gray-800">Laporan Siswa</h2>
+                <button id="close-report" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Rekapitulasi</h3>
+                    <div class="flex space-x-3">
+                        <select id="report-view-type" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="monthly">Bulanan</option>
+                            <option value="daily">Harian</option>
+                        </select>
+                        <input type="date" id="report-date" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hidden">
+                        <select id="report-month" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="1">Januari</option>
+                            <option value="2">Februari</option>
+                            <option value="3">Maret</option>
+                            <option value="4">April</option>
+                            <option value="5">Mei</option>
+                            <option value="6">Juni</option>
+                            <option value="7">Juli</option>
+                            <option value="8">Agustus</option>
+                            <option value="9">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                        <select id="report-year" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-blue-50 rounded-xl p-5 shadow-sm">
+                        <h4 class="text-lg font-medium text-blue-800 mb-3">Statistik Kebiasaan</h4>
+                        <div id="habit-stats" class="space-y-3">
+                            <!-- Habit stats will be populated here -->
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-blue-200">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-blue-800">Total Poin:</span>
+                                <span id="total-points" class="text-xl font-bold text-blue-800">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 rounded-xl p-5 shadow-sm">
+                        <h4 class="text-lg font-medium text-purple-800 mb-3">Grafik Kebiasaan</h4>
+                        <div class="h-64 flex items-end justify-between space-x-2">
+                            <div id="chart-container" class="flex items-end justify-between space-x-2 w-full">
+                                <!-- Chart bars will be populated here -->
+                            </div>
+                        </div>
+                        <div class="flex justify-between mt-2 text-xs text-purple-700">
+                            <span>BP</span>
+                            <span>BI</span>
+                            <span>BO</span>
+                            <span>MS</span>
+                            <span>GB</span>
+                            <span>BM</span>
+                            <span>TC</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-green-50 rounded-xl p-5 shadow-sm">
+                    <h4 class="text-lg font-medium text-green-800 mb-3">Catatan Harian</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                            <thead class="bg-green-100">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-green-800">Tanggal</th>
+                                    <th class="px-4 py-2 text-center text-sm font-medium text-green-800">BP</th>
+                                    <th class="px-4 py-2 text-center text-sm font-medium text-green-800">BI</th>
+                                    <th class="px-4 py-2 text-center text-sm font-medium text-green-800">BO</th>
+                                    <th class="px-4 py-2 text-center text-sm font-medium text-green-800">MS</th>
+                                    <th class="px-4 py-2 text-center text-sm font-medium text-green-800">GB</th>
+                                    <th class="px-4 py-2 text-center text-sm font-medium text-green-800">BM</th>
+                                    <th class="px-4 py-2 text-center text-sm font-medium text-green-800">TC</th>
+                                    <th class="px-4 py-2 text-center text-sm font-medium text-green-800">Poin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="daily-records">
+                                <!-- Daily records will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-4xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Peringkat 5 Besar</h2>
+                <button id="close-leaderboard" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="mb-4 flex justify-end space-x-3">
+                <select id="leaderboard-view-type" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="monthly">Bulanan</option>
+                    <option value="daily">Harian</option>
+                </select>
+                <input type="date" id="leaderboard-date" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hidden">
+                <select id="leaderboard-month" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">Agustus</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+                <select id="leaderboard-year" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                </select>
+            </div>
+            
+            <div id="leaderboard-container" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <!-- Leaderboard items will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Class Analysis Modal -->
+    <div id="class-analysis-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Analisis Kebiasaan Kelas</h2>
+                <button id="close-class-analysis" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="mb-4 flex justify-end space-x-3">
+                <select id="analysis-view-type" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="monthly">Bulanan</option>
+                    <option value="daily">Harian</option>
+                </select>
+                <input type="date" id="analysis-date" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hidden">
+                <select id="analysis-month" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">Agustus</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+                <select id="analysis-year" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                </select>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="bg-blue-50 rounded-xl p-5 shadow-sm">
+                    <h3 class="text-lg font-medium text-blue-800 mb-4">Kebiasaan Paling Sering Dilakukan</h3>
+                    <div id="most-practiced-habits" class="space-y-4">
+                        <!-- Most practiced habits will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="bg-orange-50 rounded-xl p-5 shadow-sm">
+                    <h3 class="text-lg font-medium text-orange-800 mb-4">Kebiasaan yang Perlu Ditingkatkan</h3>
+                    <div id="least-practiced-habits" class="space-y-4">
+                        <!-- Least practiced habits will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-purple-50 rounded-xl p-5 shadow-sm mb-6">
+                <h3 class="text-lg font-medium text-purple-800 mb-4">Perbandingan Kebiasaan Kelas</h3>
+                <div class="h-64">
+                    <div id="class-habits-chart" class="h-full flex items-end justify-between space-x-4">
+                        <!-- Class habits chart will be populated here -->
+                    </div>
+                </div>
+                <div class="flex justify-between mt-2 text-xs text-purple-700">
+                    <span>Bangun Pagi</span>
+                    <span>Beribadah</span>
+                    <span>Berolahraga</span>
+                    <span>Makan Sehat</span>
+                    <span>Gemar Belajar</span>
+                    <span>Bermasyarakat</span>
+                    <span>Tidur Cepat</span>
+                </div>
+            </div>
+            
+            <div class="bg-green-50 rounded-xl p-5 shadow-sm">
+                <h3 class="text-lg font-medium text-green-800 mb-4">Rekomendasi Peningkatan</h3>
+                <div id="habit-recommendations" class="space-y-4">
+                    <!-- Recommendations will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white py-4 text-center">
+        <p>© 2025 Jurnal 7 Kebiasaan Anak Indonesia Hebat. Hak Cipta Dilindungi.</p>
+    </footer>
+
+    <script>
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date as default
+            const today = new Date();
+            document.getElementById('record-date').valueAsDate = today;
+            
+            // Set current month and year as default
+            const currentMonth = today.getMonth() + 1;
+            const currentYear = today.getFullYear();
+            
+            document.getElementById('record-month').value = currentMonth;
+            document.getElementById('report-month').value = currentMonth;
+            document.getElementById('leaderboard-month').value = currentMonth;
+            document.getElementById('analysis-month').value = currentMonth;
+            
+            document.getElementById('record-year').value = currentYear;
+            document.getElementById('report-year').value = currentYear;
+            document.getElementById('leaderboard-year').value = currentYear;
+            document.getElementById('analysis-year').value = currentYear;
+
+            // Set default date for daily views
+            document.getElementById('report-date').valueAsDate = today;
+            document.getElementById('leaderboard-date').valueAsDate = today;
+            document.getElementById('analysis-date').valueAsDate = today;
+            
+            // Application data
+            const appData = {
+                // Data utama aplikasi
+                schoolName: '',
+                teacherName: '',
+                className: '',
+                students: [],
+                records: {}
+            };
+
+        // ----- LOCAL STORAGE HANDLER -----
+        function saveAppData() {
+            localStorage.setItem('appData', JSON.stringify(appData));
+        }
+
+        function loadAppData() {
+            const savedData = localStorage.getItem('appData');
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                Object.assign(appData, parsed);
+            }
+        }
+
+        // Load data at start
+        loadAppData();
+    
+            
+            // Habit names and descriptions
+            const habitNames = {
+                bangunPagi: 'Bangun Pagi',
+                beribadah: 'Beribadah',
+                berolahraga: 'Berolahraga',
+                makanSehat: 'Makan Sehat',
+                gemarBelajar: 'Gemar Belajar',
+                bermasyarakat: 'Bermasyarakat',
+                tidurCepat: 'Tidur Cepat'
+            };
+            
+            const habitDescriptions = {
+                bangunPagi: 'Bangun pagi membantu anak memulai hari dengan energi dan semangat yang baik.',
+                beribadah: 'Beribadah membantu anak mengembangkan spiritualitas dan nilai-nilai moral.',
+                berolahraga: 'Berolahraga membantu anak menjaga kesehatan fisik dan mental.',
+                makanSehat: 'Makan sehat membantu anak mendapatkan nutrisi yang cukup untuk tumbuh kembang.',
+                gemarBelajar: 'Gemar belajar membantu anak mengembangkan pengetahuan dan keterampilan baru.',
+                bermasyarakat: 'Bermasyarakat membantu anak mengembangkan keterampilan sosial dan empati.',
+                tidurCepat: 'Tidur cepat membantu anak mendapatkan istirahat yang cukup untuk kesehatan.'
+            };
+            
+            const habitRecommendations = {
+                bangunPagi: 'Dorong siswa untuk tidur lebih awal agar dapat bangun pagi dengan segar.',
+                beribadah: 'Ingatkan pentingnya beribadah dan buat kegiatan ibadah bersama di kelas.',
+                berolahraga: 'Adakan kegiatan olahraga rutin dan menyenangkan di sekolah.',
+                makanSehat: 'Edukasi tentang pentingnya makanan sehat dan dampaknya pada kesehatan.',
+                gemarBelajar: 'Buat kegiatan belajar yang menarik dan interaktif untuk meningkatkan minat belajar.',
+                bermasyarakat: 'Adakan kegiatan sosial dan kerja kelompok untuk meningkatkan interaksi sosial.',
+                tidurCepat: 'Edukasi tentang pentingnya tidur cukup dan dampaknya pada kesehatan dan konsentrasi.'
+            };
+            
+            // Event listeners for navigation
+            document.getElementById('start-btn').addEventListener('click', function() {
+                const schoolName = document.getElementById('school-name').value.trim();
+                const teacherName = document.getElementById('teacher-name').value.trim();
+                const className = document.getElementById('class-name').value.trim();
+                
+                if (!schoolName || !teacherName || !className) {
+                    alert('Mohon lengkapi semua data sebelum melanjutkan.');
+                    return;
+                }
+                
+                appData.schoolName = schoolName;
+                saveAppData();
+                appData.teacherName = teacherName;
+                saveAppData();
+                appData.className = className;
+                saveAppData();
+                
+                document.getElementById('header-school-name').textContent = schoolName;
+                document.getElementById('header-teacher-name').textContent = 'Guru: ' + teacherName;
+                document.getElementById('header-class-info').textContent = 'Kelas: ' + className;
+                
+                document.getElementById('welcome-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+            });
+            
+            document.getElementById('back-to-welcome').addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin keluar? Data yang belum disimpan akan hilang.')) {
+                    document.getElementById('dashboard').classList.add('hidden');
+                    document.getElementById('welcome-screen').classList.remove('hidden');
+                }
+            });
+            
+            // Settings functionality
+            document.getElementById('settings-btn').addEventListener('click', function() {
+                document.getElementById('settings-school-name').value = appData.schoolName;
+                document.getElementById('settings-teacher-name').value = appData.teacherName;
+                document.getElementById('settings-class-name').value = appData.className;
+                document.getElementById('settings-modal').classList.remove('hidden');
+            });
+            
+            document.getElementById('close-settings').addEventListener('click', function() {
+                document.getElementById('settings-modal').classList.add('hidden');
+            });
+            
+            document.getElementById('cancel-settings').addEventListener('click', function() {
+                document.getElementById('settings-modal').classList.add('hidden');
+            });
+            
+            document.getElementById('save-settings').addEventListener('click', function() {
+                const schoolName = document.getElementById('settings-school-name').value.trim();
+                const teacherName = document.getElementById('settings-teacher-name').value.trim();
+                const className = document.getElementById('settings-class-name').value.trim();
+                
+                if (!schoolName || !teacherName || !className) {
+                    alert('Mohon lengkapi semua data sebelum menyimpan.');
+                    return;
+                }
+                
+                appData.schoolName = schoolName;
+                saveAppData();
+                appData.teacherName = teacherName;
+                saveAppData();
+                appData.className = className;
+                saveAppData();
+                
+                document.getElementById('header-school-name').textContent = schoolName;
+                document.getElementById('header-teacher-name').textContent = 'Guru: ' + teacherName;
+                document.getElementById('header-class-info').textContent = 'Kelas: ' + className;
+                
+                document.getElementById('settings-modal').classList.add('hidden');
+                
+                // Show confirmation message
+                showNotification('Pengaturan berhasil disimpan!');
+            });
+            
+            // Add student functionality
+            document.getElementById('add-student-btn').addEventListener('click', function() {
+                document.getElementById('add-student-modal').classList.remove('hidden');
+                document.getElementById('new-student-name').focus();
+            });
+            
+            document.getElementById('cancel-add-student').addEventListener('click', function() {
+                document.getElementById('add-student-modal').classList.add('hidden');
+                document.getElementById('new-student-name').value = '';
+            });
+            
+            document.getElementById('confirm-add-student').addEventListener('click', function() {
+                const studentName = document.getElementById('new-student-name').value.trim();
+                
+                if (!studentName) {
+                    alert('Mohon masukkan nama siswa.');
+                    return;
+                }
+                
+                // Check if student already exists
+                if (appData.students.some(student => student.name.toLowerCase() === studentName.toLowerCase())) {
+                    alert('Siswa dengan nama tersebut sudah ada.');
+                    return;
+                }
+                
+                // Add new student
+                const newStudent = {
+                    id: Date.now().toString(),
+                    name: studentName
+                };
+                
+                appData.students.push(newStudent);
+                saveAppData();
+                updateStudentsTable();
+                saveAppData();
+                
+                document.getElementById('add-student-modal').classList.add('hidden');
+                document.getElementById('new-student-name').value = '';
+                
+                showNotification('Siswa baru berhasil ditambahkan!');
+            });
+            
+            // View leaderboard functionality
+            document.getElementById('view-leaderboard-btn').addEventListener('click', function() {
+                updateLeaderboard();
+                document.getElementById('leaderboard-modal').classList.remove('hidden');
+            });
+            
+            document.getElementById('close-leaderboard').addEventListener('click', function() {
+                document.getElementById('leaderboard-modal').classList.add('hidden');
+            });
+            
+            // Leaderboard view type change
+            document.getElementById('leaderboard-view-type').addEventListener('change', function() {
+                const viewType = this.value;
+                if (viewType === 'daily') {
+                    document.getElementById('leaderboard-date').classList.remove('hidden');
+                    document.getElementById('leaderboard-month').classList.add('hidden');
+                    document.getElementById('leaderboard-year').classList.add('hidden');
+                } else {
+                    document.getElementById('leaderboard-date').classList.add('hidden');
+                    document.getElementById('leaderboard-month').classList.remove('hidden');
+                    document.getElementById('leaderboard-year').classList.remove('hidden');
+                }
+                updateLeaderboard();
+            });
+            document.getElementById('leaderboard-date').addEventListener('change', updateLeaderboard);
+            document.getElementById('leaderboard-month').addEventListener('change', updateLeaderboard);
+            document.getElementById('leaderboard-year').addEventListener('change', updateLeaderboard);
+            
+            // Class analysis functionality
+            document.getElementById('class-analysis-btn').addEventListener('click', function() {
+                updateClassAnalysis();
+                document.getElementById('class-analysis-modal').classList.remove('hidden');
+            });
+            
+            document.getElementById('close-class-analysis').addEventListener('click', function() {
+                document.getElementById('class-analysis-modal').classList.add('hidden');
+            });
+            
+            // Class analysis view type change
+            document.getElementById('analysis-view-type').addEventListener('change', function() {
+                const viewType = this.value;
+                if (viewType === 'daily') {
+                    document.getElementById('analysis-date').classList.remove('hidden');
+                    document.getElementById('analysis-month').classList.add('hidden');
+                    document.getElementById('analysis-year').classList.add('hidden');
+                } else {
+                    document.getElementById('analysis-date').classList.add('hidden');
+                    document.getElementById('analysis-month').classList.remove('hidden');
+                    document.getElementById('analysis-year').classList.remove('hidden');
+                }
+                updateClassAnalysis();
+            });
+            document.getElementById('analysis-date').addEventListener('change', updateClassAnalysis);
+            document.getElementById('analysis-month').addEventListener('change', updateClassAnalysis);
+            document.getElementById('analysis-year').addEventListener('change', updateClassAnalysis);
+            
+            // Close student report modal
+            document.getElementById('close-report').addEventListener('click', function() {
+                document.getElementById('student-report-modal').classList.add('hidden');
+            });
+            
+            // Student report view type change
+            document.getElementById('report-view-type').addEventListener('change', function() {
+                const viewType = this.value;
+                if (viewType === 'daily') {
+                    document.getElementById('report-date').classList.remove('hidden');
+                    document.getElementById('report-month').classList.add('hidden');
+                    document.getElementById('report-year').classList.add('hidden');
+                } else {
+                    document.getElementById('report-date').classList.add('hidden');
+                    document.getElementById('report-month').classList.remove('hidden');
+                    document.getElementById('report-year').classList.remove('hidden');
+                }
+                const studentId = document.getElementById('student-report-modal').dataset.studentId;
+                if (studentId) {
+                    updateStudentReport(studentId);
+                }
+            });
+
+            // Update report when date/month/year changes
+            document.getElementById('report-date').addEventListener('change', function() {
+                const studentId = document.getElementById('student-report-modal').dataset.studentId;
+                if (studentId) {
+                    updateStudentReport(studentId);
+                }
+            });
+            document.getElementById('report-month').addEventListener('change', function() {
+                const studentId = document.getElementById('student-report-modal').dataset.studentId;
+                if (studentId) {
+                    updateStudentReport(studentId);
+                }
+            });
+            
+            document.getElementById('report-year').addEventListener('change', function() {
+                const studentId = document.getElementById('student-report-modal').dataset.studentId;
+                if (studentId) {
+                    updateStudentReport(studentId);
+                }
+            });
+            
+            // Function to show notification
+            function showNotification(message) {
+                // Remove any existing notification
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+                
+                // Create new notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 notification';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                // Remove notification after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+            
+            
+            // Function to delete a student
+            function deleteStudent(studentId) {
+                appData.students = appData.students.filter(s => s.id !== studentId);
+                Object.keys(appData.records).forEach(dateKey => {
+                    if (appData.records[dateKey][studentId]) {
+                        delete appData.records[dateKey][studentId];
+                    }
+                });
+                saveAppData();
+                updateStudentsTable();
+                showNotification('Siswa berhasil dihapus!');
+            }
+    
+            // Function to update the students table
+            function updateStudentsTable() {
+                const tableBody = document.getElementById('students-table-body');
+                const recordDateInput = document.getElementById('record-date');
+
+                // Ensure date is in YYYY-MM-DD format for consistency
+                const selectedDate = new Date(recordDateInput.value);
+                const year = selectedDate.getFullYear();
+                const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
+                const day = selectedDate.getDate().toString().padStart(2, '0');
+                const dateKey = `${year}-${month}-${day}`;
+                
+                if (appData.students.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="11" class="px-4 py-8 text-center text-gray-500">
+                                Belum ada data siswa. Silakan tambahkan siswa terlebih dahulu.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                let tableHTML = '';
+                
+                appData.students.forEach((student, index) => {
+                    const studentRecord = (appData.records[dateKey] && appData.records[dateKey][student.id]) || {
+                        bangunPagi: false,
+                        beribadah: false,
+                        berolahraga: false,
+                        makanSehat: false,
+                        gemarBelajar: false,
+                        bermasyarakat: false,
+                        tidurCepat: false
+                    };
+                    
+                    const pointsToday = Object.values(studentRecord).filter(Boolean).length;
+                    
+                    tableHTML += `
+                        <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
+                            <td class="px-4 py-3 text-gray-800">${index + 1}</td>
+                            <td class="px-4 py-3 text-gray-800 font-medium">${student.name}</td>
+                            <td class="px-4 py-3 text-center">
+                                <input type="checkbox" data-student="${student.id}" data-habit="bangunPagi" class="habit-checkbox w-5 h-5 text-blue-600 rounded focus:ring-blue-500" ${studentRecord.bangunPagi ? 'checked' : ''}>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <input type="checkbox" data-student="${student.id}" data-habit="beribadah" class="habit-checkbox w-5 h-5 text-blue-600 rounded focus:ring-blue-500" ${studentRecord.beribadah ? 'checked' : ''}>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <input type="checkbox" data-student="${student.id}" data-habit="berolahraga" class="habit-checkbox w-5 h-5 text-blue-600 rounded focus:ring-blue-500" ${studentRecord.berolahraga ? 'checked' : ''}>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <input type="checkbox" data-student="${student.id}" data-habit="makanSehat" class="habit-checkbox w-5 h-5 text-blue-600 rounded focus:ring-blue-500" ${studentRecord.makanSehat ? 'checked' : ''}>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <input type="checkbox" data-student="${student.id}" data-habit="gemarBelajar" class="habit-checkbox w-5 h-5 text-blue-600 rounded focus:ring-blue-500" ${studentRecord.gemarBelajar ? 'checked' : ''}>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <input type="checkbox" data-student="${student.id}" data-habit="bermasyarakat" class="habit-checkbox w-5 h-5 text-blue-600 rounded focus:ring-blue-500" ${studentRecord.bermasyarakat ? 'checked' : ''}>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <input type="checkbox" data-student="${student.id}" data-habit="tidurCepat" class="habit-checkbox w-5 h-5 text-blue-600 rounded focus:ring-blue-500" ${studentRecord.tidurCepat ? 'checked' : ''}>
+                            </td>
+                            <td class="px-4 py-3 text-center font-bold text-blue-700">${pointsToday}</td>
+                            <td class="px-4 py-3 text-center">
+                                <button data-student="${student.id}" class="view-report-btn px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition">Laporan</button>
+                                <button data-delete-student="${student.id}" class="delete-student-btn px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"><svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 1 0 00-1-1m-4 0h4'/></svg></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tableBody.innerHTML = tableHTML;
+                
+                // Add event listeners to checkboxes
+                document.querySelectorAll('.habit-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const studentId = this.dataset.student;
+                        const habit = this.dataset.habit;
+                        const isChecked = this.checked;
+                        
+                        const selectedDate = new Date(recordDateInput.value);
+                        const year = selectedDate.getFullYear();
+                        const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+                        const day = selectedDate.getDate().toString().padStart(2, '0');
+                        const dateKey = `${year}-${month}-${day}`;
+                        
+                        if (!appData.records[dateKey]) {
+                            appData.records[dateKey] = {};
+                        }
+                        
+                        if (!appData.records[dateKey][studentId]) {
+                            appData.records[dateKey][studentId] = {
+                                bangunPagi: false,
+                                beribadah: false,
+                                berolahraga: false,
+                                makanSehat: false,
+                                gemarBelajar: false,
+                                bermasyarakat: false,
+                                tidurCepat: false
+                            };
+                        }
+                        
+                        appData.records[dateKey][studentId][habit] = isChecked;
+                        updateStudentsTable();
+                        saveAppData();
+                    });
+                });
+                
+                // Add event listeners to report buttons
+                // Event listeners to delete student buttons
+                document.querySelectorAll('.delete-student-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const studentId = this.dataset.deleteStudent;
+                        if (confirm('Yakin ingin menghapus siswa ini?')) {
+                            deleteStudent(studentId);
+                        }
+                    });
+                });
+    
+                document.querySelectorAll('.view-report-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const studentId = this.dataset.student;
+                        updateStudentReport(studentId);
+                        document.getElementById('student-report-modal').classList.remove('hidden');
+                        document.getElementById('student-report-modal').dataset.studentId = studentId;
+                    });
+                });
+            }
+            
+            // Function to update student report
+            function updateStudentReport(studentId) {
+                const student = appData.students.find(s => s.id === studentId);
+                if (!student) return;
+                
+                document.getElementById('report-student-name').textContent = `Laporan: ${student.name}`;
+                
+                const viewType = document.getElementById('report-view-type').value;
+                let month, year, date;
+
+                if (viewType === 'monthly') {
+                    month = document.getElementById('report-month').value.padStart(2, '0');
+                    year = document.getElementById('report-year').value;
+                } else { // daily
+                    const selectedDate = new Date(document.getElementById('report-date').value);
+                    year = selectedDate.getFullYear().toString();
+                    month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+                    date = selectedDate.getDate().toString().padStart(2, '0');
+                }
+                
+                // Calculate habit statistics
+                const habitStats = {
+                    bangunPagi: 0,
+                    beribadah: 0,
+                    berolahraga: 0,
+                    makanSehat: 0,
+                    gemarBelajar: 0,
+                    bermasyarakat: 0,
+                    tidurCepat: 0
+                };
+                
+                const dailyRecords = [];
+                
+                // Loop through all records for the selected month and year
+                Object.keys(appData.records).forEach(dateKey => {
+                    const [recordYear, recordMonth, recordDay] = dateKey.split('-');
+                    
+                    if (viewType === 'monthly') {
+                        if (recordYear === year && recordMonth === month && appData.records[dateKey][studentId]) {
+                            const record = appData.records[dateKey][studentId];
+                            
+                            // Add to habit stats
+                            Object.keys(record).forEach(habit => {
+                                if (record[habit]) {
+                                    habitStats[habit]++;
+                                }
+                            });
+                            
+                            // Add to daily records
+                            dailyRecords.push({
+                                date: recordDay,
+                                record: record,
+                                points: Object.values(record).filter(Boolean).length
+                            });
+                        }
+                    } else { // daily
+                        if (recordYear === year && recordMonth === month && recordDay === date && appData.records[dateKey][studentId]) {
+                            const record = appData.records[dateKey][studentId];
+                            Object.keys(record).forEach(habit => {
+                                if (record[habit]) {
+                                    habitStats[habit]++;
+                                }
+                            });
+                            dailyRecords.push({
+                                date: recordDay,
+                                record: record,
+                                points: Object.values(record).filter(Boolean).length
+                            });
+                        }
+                    }
+                });
+                
+                // Sort daily records by date
+                dailyRecords.sort((a, b) => parseInt(a.date) - parseInt(b.date));
+                
+                // Update habit stats display
+                const habitStatsContainer = document.getElementById('habit-stats');
+                let habitStatsHTML = '';
+                
+                Object.keys(habitStats).forEach(habit => {
+                    habitStatsHTML += `
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">${habitNames[habit]}:</span>
+                            <span class="font-medium text-blue-700">${habitStats[habit]} hari</span>
+                        </div>
+                    `;
+                });
+                
+                habitStatsContainer.innerHTML = habitStatsHTML;
+                
+                // Update total points
+                const totalPoints = Object.values(habitStats).reduce((sum, val) => sum + val, 0);
+                document.getElementById('total-points').textContent = totalPoints;
+                
+                // Update chart
+                const chartContainer = document.getElementById('chart-container');
+                let chartHTML = '';
+                
+                const maxValue = Math.max(...Object.values(habitStats), 1);
+                const habitColors = {
+                    bangunPagi: 'bg-red-500',
+                    beribadah: 'bg-blue-500',
+                    berolahraga: 'bg-green-500',
+                    makanSehat: 'bg-yellow-500',
+                    gemarBelajar: 'bg-purple-500',
+                    bermasyarakat: 'bg-pink-500',
+                    tidurCepat: 'bg-indigo-500'
+                };
+                
+                Object.keys(habitStats).forEach(habit => {
+                    const height = (habitStats[habit] / maxValue) * 100;
+                    chartHTML += `
+                        <div class="flex flex-col items-center w-full">
+                            <div class="relative w-full flex justify-center">
+                                <div class="${habitColors[habit]} rounded-t-md w-8" style="height: ${height}%"></div>
+                                <div class="absolute -top-6 text-xs font-medium text-purple-800">${habitStats[habit]}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                chartContainer.innerHTML = chartHTML;
+                
+                // Update daily records table
+                const dailyRecordsContainer = document.getElementById('daily-records');
+                let dailyRecordsHTML = '';
+                
+                if (dailyRecords.length === 0) {
+                    dailyRecordsHTML = `
+                        <tr>
+                            <td colspan="9" class="px-4 py-4 text-center text-gray-500">
+                                Belum ada catatan untuk ${viewType === 'monthly' ? 'bulan ini' : 'tanggal ini'}.
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    dailyRecords.forEach(dailyRecord => {
+                        dailyRecordsHTML += `
+                            <tr class="border-b border-green-100">
+                                <td class="px-4 py-2 text-left text-sm text-gray-700">${dailyRecord.date}/${month}/${year}</td>
+                                <td class="px-4 py-2 text-center">${dailyRecord.record.bangunPagi ? '✓' : '-'}</td>
+                                <td class="px-4 py-2 text-center">${dailyRecord.record.beribadah ? '✓' : '-'}</td>
+                                <td class="px-4 py-2 text-center">${dailyRecord.record.berolahraga ? '✓' : '-'}</td>
+                                <td class="px-4 py-2 text-center">${dailyRecord.record.makanSehat ? '✓' : '-'}</td>
+                                <td class="px-4 py-2 text-center">${dailyRecord.record.gemarBelajar ? '✓' : '-'}</td>
+                                <td class="px-4 py-2 text-center">${dailyRecord.record.bermasyarakat ? '✓' : '-'}</td>
+                                <td class="px-4 py-2 text-center">${dailyRecord.record.tidurCepat ? '✓' : '-'}</td>
+                                <td class="px-4 py-2 text-center font-medium text-green-700">${dailyRecord.points}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                
+                dailyRecordsContainer.innerHTML = dailyRecordsHTML;
+            }
+            
+            // Function to update leaderboard
+            function updateLeaderboard() {
+                const viewType = document.getElementById('leaderboard-view-type').value;
+                let month, year, date;
+
+                if (viewType === 'monthly') {
+                    month = document.getElementById('leaderboard-month').value.padStart(2, '0');
+                    year = document.getElementById('leaderboard-year').value;
+                } else { // daily
+                    const selectedDate = new Date(document.getElementById('leaderboard-date').value);
+                    year = selectedDate.getFullYear().toString();
+                    month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+                    date = selectedDate.getDate().toString().padStart(2, '0');
+                }
+                
+                // Calculate points for each student
+                const studentPoints = {};
+                
+                appData.students.forEach(student => {
+                    studentPoints[student.id] = {
+                        id: student.id,
+                        name: student.name,
+                        points: 0
+                    };
+                });
+                
+                // Loop through all records for the selected month and year
+                Object.keys(appData.records).forEach(dateKey => {
+                    const [recordYear, recordMonth, recordDay] = dateKey.split('-');
+                    
+                    if (viewType === 'monthly') {
+                        if (recordYear === year && recordMonth === month) {
+                            Object.keys(appData.records[dateKey]).forEach(studentId => {
+                                if (studentPoints[studentId]) {
+                                    const record = appData.records[dateKey][studentId];
+                                    const pointsForDay = Object.values(record).filter(Boolean).length;
+                                    studentPoints[studentId].points += pointsForDay;
+                                }
+                            });
+                        }
+                    } else { // daily
+                        if (recordYear === year && recordMonth === month && recordDay === date) {
+                            Object.keys(appData.records[dateKey]).forEach(studentId => {
+                                if (studentPoints[studentId]) {
+                                    const record = appData.records[dateKey][studentId];
+                                    const pointsForDay = Object.values(record).filter(Boolean).length;
+                                    studentPoints[studentId].points += pointsForDay;
+                                }
+                            });
+                        }
+                    }
+                });
+                
+                // Sort students by points
+                const sortedStudents = Object.values(studentPoints).sort((a, b) => b.points - a.points);
+                
+                // Get top 5 students
+                const topStudents = sortedStudents.slice(0, 5);
+                
+                // Update leaderboard display
+                const leaderboardContainer = document.getElementById('leaderboard-container');
+                let leaderboardHTML = '';
+                
+                if (topStudents.length === 0 || topStudents.every(s => s.points === 0)) {
+                    leaderboardHTML = `
+                        <div class="col-span-5 p-8 text-center text-gray-500">
+                            Belum ada data untuk ${viewType === 'monthly' ? 'bulan ini' : 'tanggal ini'}.
+                        </div>
+                    `;
+                } else {
+                    // Medal emojis
+                    const medals = ['🥇', '🥈', '🥉', '🏅', '🏅'];
+                    const medalClasses = ['medal-1', 'medal-2', 'medal-3', 'medal-4', 'medal-5'];
+                    
+                    topStudents.forEach((student, index) => {
+                        leaderboardHTML += `
+                            <div class="leaderboard-item ${medalClasses[index]} rounded-xl p-4 text-center shadow-lg flex flex-col items-center justify-between">
+                                <div class="text-4xl mb-2">${medals[index]}</div>
+                                <div class="text-xl font-bold text-gray-800 mb-1">${index + 1}</div>
+                                <div class="text-lg font-medium text-gray-800 mb-3">${student.name}</div>
+                                <div class="bg-white rounded-full px-4 py-1 font-bold text-lg">
+                                    ${student.points} Poin
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                leaderboardContainer.innerHTML = leaderboardHTML;
+            }
+            
+            // Function to update class analysis
+            function updateClassAnalysis() {
+                const viewType = document.getElementById('analysis-view-type').value;
+                let month, year, date;
+
+                if (viewType === 'monthly') {
+                    month = document.getElementById('analysis-month').value.padStart(2, '0');
+                    year = document.getElementById('analysis-year').value;
+                } else { // daily
+                    const selectedDate = new Date(document.getElementById('analysis-date').value);
+                    year = selectedDate.getFullYear().toString();
+                    month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+                    date = selectedDate.getDate().toString().padStart(2, '0');
+                }
+                
+                // Calculate habit statistics for the entire class
+                const habitStats = {
+                    bangunPagi: 0,
+                    beribadah: 0,
+                    berolahraga: 0,
+                    makanSehat: 0,
+                    gemarBelajar: 0,
+                    bermasyarakat: 0,
+                    tidurCepat: 0
+                };
+                
+                let totalPossibleHabitsPerHabit = {
+                    bangunPagi: 0,
+                    beribadah: 0,
+                    berolahraga: 0,
+                    makanSehat: 0,
+                    gemarBelajar: 0,
+                    bermasyarakat: 0,
+                    tidurCepat: 0
+                };
+
+                // Count days in the selected month (for monthly view) or set to 1 (for daily view)
+                const daysForCalculation = (viewType === 'monthly') ? new Date(year, parseInt(month), 0).getDate() : 1;
+                
+                // Loop through all records for the selected month and year
+                Object.keys(appData.records).forEach(dateKey => {
+                    const [recordYear, recordMonth, recordDay] = dateKey.split('-');
+                    
+                    if (viewType === 'monthly') {
+                        if (recordYear === year && recordMonth === month) {
+                            Object.keys(appData.records[dateKey]).forEach(studentId => {
+                                const record = appData.records[dateKey][studentId];
+                                
+                                // Add to habit stats
+                                Object.keys(record).forEach(habit => {
+                                    if (record[habit]) {
+                                        habitStats[habit]++;
+                                    }
+                                });
+                            });
+                        }
+                    } else { // daily
+                        if (recordYear === year && recordMonth === month && recordDay === date) {
+                            Object.keys(appData.records[dateKey]).forEach(studentId => {
+                                const record = appData.records[dateKey][studentId];
+                                Object.keys(record).forEach(habit => {
+                                    if (record[habit]) {
+                                        habitStats[habit]++;
+                                    }
+                                });
+                            });
+                        }
+                    }
+                });
+
+                // Calculate total possible habits for each habit based on number of students and days in month/day
+                appData.students.forEach(() => {
+                    Object.keys(habitStats).forEach(habit => {
+                        totalPossibleHabitsPerHabit[habit] += daysForCalculation;
+                    });
+                });
+                
+                // If no data, show message
+                if (Object.values(habitStats).every(count => count === 0)) {
+                    document.getElementById('most-practiced-habits').innerHTML = `
+                        <div class="p-4 text-center text-gray-500">
+                            Belum ada data untuk ${viewType === 'monthly' ? 'bulan ini' : 'tanggal ini'}.
+                        </div>
+                    `;
+                    
+                    document.getElementById('least-practiced-habits').innerHTML = `
+                        <div class="p-4 text-center text-gray-500">
+                            Belum ada data untuk ${viewType === 'monthly' ? 'bulan ini' : 'tanggal ini'}.
+                        </div>
+                    `;
+                    
+                    document.getElementById('class-habits-chart').innerHTML = `
+                        <div class="w-full p-4 text-center text-gray-500">
+                            Belum ada data untuk ${viewType === 'monthly' ? 'bulan ini' : 'tanggal ini'}.
+                        </div>
+                    `;
+                    
+                    document.getElementById('habit-recommendations').innerHTML = `
+                        <div class="p-4 text-center text-gray-500">
+                            Belum ada data untuk ${viewType === 'monthly' ? 'bulan ini' : 'tanggal ini'}.
+                        </div>
+                    `;
+                    
+                    return;
+                }
+                
+                // Calculate percentages
+                const habitPercentages = {};
+                Object.keys(habitStats).forEach(habit => {
+                    habitPercentages[habit] = totalPossibleHabitsPerHabit[habit] > 0 ? (habitStats[habit] / totalPossibleHabitsPerHabit[habit]) * 100 : 0;
+                });
+                
+                // Sort habits by percentage
+                const sortedHabits = Object.keys(habitPercentages).sort((a, b) => habitPercentages[b] - habitPercentages[a]);
+                
+                // Get most practiced habits (top 3)
+                const mostPracticedHabits = sortedHabits.slice(0, 3);
+                
+                // Get least practiced habits (bottom 3)
+                const leastPracticedHabits = sortedHabits.slice(-3).reverse();
+                
+                // Update most practiced habits display
+                const mostPracticedContainer = document.getElementById('most-practiced-habits');
+                let mostPracticedHTML = '';
+                
+                mostPracticedHabits.forEach(habit => {
+                    const percentage = habitPercentages[habit].toFixed(1);
+                    mostPracticedHTML += `
+                        <div class="bg-white rounded-lg p-4 shadow-sm">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-blue-800">${habitNames[habit]}</span>
+                                <span class="font-bold text-blue-600">${percentage}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-blue-600 h-2.5 rounded-full progress-bar" style="width: ${percentage}%"></div>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-600">${habitDescriptions[habit]}</p>
+                        </div>
+                    `;
+                });
+                
+                mostPracticedContainer.innerHTML = mostPracticedHTML;
+                
+                // Update least practiced habits display
+                const leastPracticedContainer = document.getElementById('least-practiced-habits');
+                let leastPracticedHTML = '';
+                
+                leastPracticedHabits.forEach(habit => {
+                    const percentage = habitPercentages[habit].toFixed(1);
+                    leastPracticedHTML += `
+                        <div class="bg-white rounded-lg p-4 shadow-sm">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-orange-800">${habitNames[habit]}</span>
+                                <span class="font-bold text-orange-600">${percentage}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-orange-500 h-2.5 rounded-full progress-bar" style="width: ${percentage}%"></div>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-600">${habitDescriptions[habit]}</p>
+                        </div>
+                    `;
+                });
+                
+                leastPracticedContainer.innerHTML = leastPracticedHTML;
+                
+                // Update class habits chart
+                const classHabitsChartContainer = document.getElementById('class-habits-chart');
+                let classHabitsChartHTML = '';
+                
+                const habitColors = {
+                    bangunPagi: 'bg-red-500',
+                    beribadah: 'bg-blue-500',
+                    berolahraga: 'bg-green-500',
+                    makanSehat: 'bg-yellow-500',
+                    gemarBelajar: 'bg-purple-500',
+                    bermasyarakat: 'bg-pink-500',
+                    tidurCepat: 'bg-indigo-500'
+                };
+                
+                Object.keys(habitStats).forEach(habit => {
+                    const percentage = habitPercentages[habit];
+                    classHabitsChartHTML += `
+                        <div class="flex flex-col items-center justify-end w-full">
+                            <div class="relative w-full flex justify-center">
+                                <div class="${habitColors[habit]} rounded-t-md w-16" style="height: ${percentage}%"></div>
+                                <div class="absolute -top-6 text-xs font-medium text-purple-800">${percentage.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                classHabitsChartContainer.innerHTML = classHabitsChartHTML;
+                
+                // Update recommendations
+                const recommendationsContainer = document.getElementById('habit-recommendations');
+                let recommendationsHTML = '';
+                
+                // Focus on the 2 least practiced habits for recommendations
+                leastPracticedHabits.slice(0, 2).forEach(habit => {
+                    recommendationsHTML += `
+                        <div class="bg-white rounded-lg p-4 shadow-sm">
+                            <h4 class="font-medium text-green-800 mb-2">Untuk meningkatkan "${habitNames[habit]}":</h4>
+                            <p class="text-gray-700">${habitRecommendations[habit]}</p>
+                        </div>
+                    `;
+                });
+                
+                // Add general recommendation
+                recommendationsHTML += `
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <h4 class="font-medium text-green-800 mb-2">Rekomendasi Umum:</h4>
+                        <p class="text-gray-700">Adakan diskusi kelas tentang pentingnya 7 kebiasaan baik dan bagaimana mereka dapat membantu siswa menjadi lebih sukses dan bahagia. Buat sistem penghargaan untuk siswa yang konsisten menjalankan kebiasaan baik.</p>
+                    </div>
+                `;
+                
+                recommendationsContainer.innerHTML = recommendationsHTML;
+            }
+            
+            // Excel export functionality
+            document.getElementById('export-excel-btn').addEventListener('click', function() {
+                const data = [];
+                
+                // Create header row
+                const headers = [
+                    'No', 
+                    'Nama Siswa', 
+                    'Bangun Pagi', 
+                    'Beribadah',
+                    'Berolahraga',
+                    'Makan Sehat',
+                    'Gemar Belajar',
+                    'Bermasyarakat',
+                    'Tidur Cepat',
+                    'Poin'
+                ];
+                data.push(headers);
+                
+                // Add student data
+                const dateKey = getCurrentDateKey();
+                appData.students.forEach((student, index) => {
+                    const record = appData.records[dateKey]?.[student.id] || {};
+                    const row = [
+                        index + 1,
+                        student.name,
+                        record.bangunPagi ? '✓' : '-',
+                        record.beribadah ? '✓' : '-',
+                        record.berolahraga ? '✓' : '-',
+                        record.makanSehat ? '✓' : '-',
+                        record.gemarBelajar ? '✓' : '-',
+                        record.bermasyarakat ? '✓' : '-',
+                        record.tidurCepat ? '✓' : '-',
+                        Object.values(record).filter(Boolean).length
+                    ];
+                    data.push(row);
+                });
+                
+                // Create worksheet
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Data Kebiasaan");
+                
+                // Generate file and trigger download
+                const dateStr = new Date().toISOString().slice(0,10);
+                XLSX.writeFile(wb, `Kebiasaan_Siswa_${dateStr}.xlsx`);
+                
+                showNotification('Data berhasil diekspor ke Excel!');
+            });
+
+            function getCurrentDateKey() {
+                const date = new Date(document.getElementById('record-date').value);
+                const year = date.getFullYear();
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // Excel export functionality
+            document.getElementById('export-excel-btn').addEventListener('click', function() {
+                const data = [];
+                
+                // Create header row
+                const headers = [
+                    'No', 
+                    'Nama Siswa', 
+                    'Bangun Pagi', 
+                    'Beribadah',
+                    'Berolahraga',
+                    'Makan Sehat',
+                    'Gemar Belajar',
+                    'Bermasyarakat',
+                    'Tidur Cepat',
+                    'Poin'
+                ];
+                data.push(headers);
+                
+                // Add student data
+                const dateKey = getCurrentDateKey();
+                appData.students.forEach((student, index) => {
+                    const record = appData.records[dateKey]?.[student.id] || {};
+                    const row = [
+                        index + 1,
+                        student.name,
+                        record.bangunPagi ? '✓' : '-',
+                        record.beribadah ? '✓' : '-',
+                        record.berolahraga ? '✓' : '-',
+                        record.makanSehat ? '✓' : '-',
+                        record.gemarBelajar ? '✓' : '-',
+                        record.bermasyarakat ? '✓' : '-',
+                        record.tidurCepat ? '✓' : '-',
+                        Object.values(record).filter(Boolean).length
+                    ];
+                    data.push(row);
+                });
+                
+                // Create worksheet
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Data Kebiasaan");
+                
+                // Generate file and trigger download
+                const dateStr = new Date().toISOString().slice(0,10);
+                XLSX.writeFile(wb, `Kebiasaan_Siswa_${dateStr}.xlsx`);
+                
+                showNotification('Data berhasil diekspor ke Excel!');
+            });
+
+            function getCurrentDateKey() {
+                const date = new Date(document.getElementById('record-date').value);
+                const year = date.getFullYear();
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // Event listeners for date/month/year changes
+            document.getElementById('record-date').addEventListener('change', updateStudentsTable);
+            document.getElementById('record-month').addEventListener('change', updateStudentsTable);
+            document.getElementById('record-year').addEventListener('change', updateStudentsTable);
+            
+            // Initialize the table
+            updateStudentsTable();
+            saveAppData();
+        });
+    </script>
+</body>
+</html>
